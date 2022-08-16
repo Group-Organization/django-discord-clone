@@ -1,2 +1,6 @@
-# django-dc-clone
-Django dc web clone
+# django-discord-clone
+Django discord web clone
+
+Test: Hi!
+
+Test2: Seems to be working :D
