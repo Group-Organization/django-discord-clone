@@ -1,2 +1,4 @@
-# django-dc-clone
-Django dc web clone
+# django-discord-clone
+Django discord web clone
+
+Main app is called discordclone
