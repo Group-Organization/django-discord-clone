@@ -48,7 +48,6 @@ def loginUser(request):
 
         if not User.objects.filter(username=username).exists():
             messages.error(request, 'Username not found')
-            print(1)
             return redirect('login')
 
         user = authenticate(request, username=username, password=password)
