@@ -8,6 +8,7 @@ from . import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('userhandler.urls')),
+    path('app/', include('app.urls'))
 ]
 
 # Provisional method of leading user files, as for non-Heroku-actual-production level sites, it should be configured to save these files in like AWS
