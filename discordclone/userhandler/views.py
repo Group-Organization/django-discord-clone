@@ -50,3 +50,19 @@ def loginUser(request):
             messages.error(request, 'Username or password does not exist')
 
     return render(request, 'userhandler/register_login.html', context)
+
+
+def profile(request, pk):
+    user = User.objects.get(id=pk)
+    context = {
+        'user': user,
+    }
+    return render(request, 'userhandler/profile.html', context)
+
+
+def profiles(request):
+    users = User.objects.all()
+    context = {
+        'users': users,
+    }
+    return render(request, 'userhandler/profiles.html', context)
