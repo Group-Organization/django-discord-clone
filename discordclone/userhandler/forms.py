@@ -2,14 +2,11 @@ from django.forms import ModelForm
 from django import forms
 from .models import *
 
-
-class DateInput(forms.DateInput):
-    input_type = 'date'
-
 class UserForm(ModelForm):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username', 'email', 'password', 'bio', 'profile_picture', 'dob']
+        profile_picture = forms.ImageField()
         widgets = {
             'username': forms.TextInput(attrs={
                 'placeholder': 'eg: JohnDoe',
@@ -27,5 +24,4 @@ class UserForm(ModelForm):
                 'placeholder': 'Introduce yourself..',
                 'id': 'bio',
             }),
-            'dob': DateInput(),
         }
