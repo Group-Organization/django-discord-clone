@@ -1,0 +1,181 @@
+main {
+    display: grid;
+    height: 100%;
+    place-content: center;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    padding: 32px 64px;
+    background: rgba(152, 152, 152, 0.5);
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 400px;
+    height: max-content;
+}
+
+.container h1 {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.field input {
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: none;
+    background-color: #282828;
+    font-size: 0.8rem;
+    color: #c2c2c2;
+    font-weight: 200;
+}
+
+.field input:focus {
+    outline: none;
+}
+
+.firstfields, .secondFields {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    display: none;
+}
+
+.firstfields {
+    gap: 0px;
+}
+
+.secondFields {
+    display: flex !important;
+    /* display: none; */
+    gap: 8px !important;
+}
+
+.err {
+    font-size: .7rem;
+    color: red;
+    font-weight: 600;
+    margin-left: 8px;
+    visibility: hidden;
+}
+
+.btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+button {
+    width: 130px;
+    color: white;
+    font-weight: 600;
+    margin: 12px auto 0 auto;
+    border-radius: 10px;
+    border: none;
+    background-color: #282828;
+    padding: 8px 32px;
+    transition: all 0.3s;
+}
+
+.btns > button {
+    margin: 0 auto !important;
+    width: max-content;
+    height: max-content;
+}
+
+button:hover, .loginRedirect a:hover {
+    transform: scale(1.1);
+}
+
+
+input::file-selector-button {
+    font-weight: 500;
+    color: #c2c2c2;
+    padding: 0.5em;
+    background-color: #430E78;
+    border: thin solid #282828;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.loginRedirect {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-direction: column;
+}
+
+.loginRedirect p {
+    font-size: .7rem;
+    font-weight: 200;
+}
+
+.loginRedirect a {
+    padding: 8px 16px;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 10px;
+    background-color: black;
+    max-width: 100px;
+    background: linear-gradient(96.79deg, #313131 33.51%, #430E78 70.04%);
+    box-shadow: 1px 1px 3px #5337A3;
+    transition: all 0.3s;
+}
+
+
+@media (max-width: 400px) {
+    main {
+        display: flex;
+        align-items: center;
+    }
+    .container {
+        width: 100%;
+        border-radius: 0;
+        padding: 32px;
+
+    }
+}
+
+#profilePictureField {
+    gap: 4px;
+}
+
+#profilePictureField img {
+    margin: 0 auto;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    border: 3px solid #430E78;
+    object-fit: cover;
+}
+
+textarea {
+    height: 170px;
+    padding: 8px;
+    background-color: #282828;
+    border: none;
+    max-width: 100%;
+    border-radius: 10px;
+    color: #c2c2c2;
+}
+
+textarea:focus {
+    outline: none;
+}
+
+.show {
+    display: flex !important;
+}
+
+.hide {
+    display: none !important;
+}

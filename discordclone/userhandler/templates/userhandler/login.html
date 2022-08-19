@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block style %}
+    <link rel="stylesheet" href="{% static '/styles/login.css' %}">
+    <link rel="stylesheet" href="{% static '/styles/general.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <div class="container">
+            <h1>Login</h1>
+
+            <form method="post" class="fields">
+                {% csrf_token %}
+
+                <div class="username field">
+                    <label for="username">Username:</label>
+                    {{form.username}}
+                    <!-- <input type="text" id="username" name="username" placeholder="eg: JohnDoe"</input> -->
+                </div>
+    
+                <div class="password field">
+                    <label for="password">Password:</label>
+                    {{form.password}}
+                    <!-- <input type="password" id="password" name="password" placeholder="•••••••"</input> -->
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+
+
+            <div class="registerRedirect">
+                <p>Don't have an account?</p>
+                <a href="{% url 'register' %}">Register</a>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

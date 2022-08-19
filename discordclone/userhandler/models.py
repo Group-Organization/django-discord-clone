@@ -9,6 +9,7 @@ class User(AbstractUser):
     tag = models.IntegerField(default=0000)
     bio = models.TextField(max_length=512, blank=True)
     status = models.CharField(max_length=64, blank=True)
+    dob = models.DateField(blank=True)
     profile_picture = models.ImageField(blank=True, default='default.png')
     friend = models.ManyToManyField('User', related_name='friends', blank=True)
     blocked_users = models.ManyToManyField('User', related_name='blocked', blank=True)
