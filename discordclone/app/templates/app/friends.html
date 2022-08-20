@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
+<style>
+    main {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+</style>
+
+    <h1>{{request.user.username}}#{{request.user.tag}}</h1>
+
+    <main>
+        <div class="friends">
+            <h1>Friends</h1>
+            {% for people in friends %}
+                <a href="{% url 'profile' people.username people.tag %}">{{people.username}}</a>
+                <hr>
+            {% endfor %}
+        </div>
+
+        <div class="pending">
+            <h1>Pending</h1>
+            {% for people in pending %}
+                <a href="{% url 'profile' people.username people.tag %}">{{people.username}}</a>
+                <hr>
+            {% endfor %}
+        </div>
+
+        <div class="blocked">
+            <h1>Blocked</h1>
+            {% for people in blocked %}
+            <a href="{% url 'profile' people.username people.tag %}">{{people.username}}</a>
+            <hr>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock %}
