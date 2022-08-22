@@ -1,0 +1,50 @@
+{% extends 'layout.html' %} {% block styles %} {% endblock %} {% block content
+%}
+<style>
+	main {
+		display: grid;
+		grid-template-columns: 1fr 2fr 5fr 2fr;
+	}
+</style>
+
+<h1>{{request.user.username}}#{{request.user.tag}}</h1>
+
+<main>
+	<div class="friends">
+		<h1>Friends</h1>
+		{% for people in friends %}
+		<a href="/">{{people.username}}</a>
+		<hr />
+		{% endfor %}
+	</div>
+
+	<div class="">
+		<h1>Text Channels</h1>
+		{% for text_channel in text_channels %}
+		<a href="/">{{text_channel.name}}</a>
+		<hr />
+		{% endfor %}
+		<h1>Voice Channels</h1>
+		{% for voice_channel in voice_channels %}
+		<a href="/">{{voice_channel.name}}</a>
+		<hr />
+		{% endfor %}
+	</div>
+
+	<div class="">
+		<h1>Chat</h1>
+		{% for message in messages %}
+		<!-- <img
+		src="{{ user.profile_picture.url }}"
+		style="border-radius: 50%; width: 25px; height: 25px"
+	/>
+	<h3>{{user.username}}</h3> 
+    Commented area to pull and add user to server_message field
+    -->
+		<a href="/">{{message}}</a>
+		<hr />
+		{% endfor %}
+	</div>
+	<div></div>
+</main>
+{% endblock %}
