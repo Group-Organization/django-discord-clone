@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from discordclone.userhandler.models import User
+from userhandler.models import User
 
 # Create your models here.
 
@@ -67,4 +67,3 @@ class VoiceChannel(TextChannel):
 class ServerMessage(Message):
     channel = models.ForeignKey(TextChannel, on_delete=models.CASCADE)
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.SET('User Deleted'))

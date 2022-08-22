@@ -12,7 +12,7 @@ class User(AbstractUser):
     dob = models.DateField(blank=True)
     profile_picture = models.ImageField(
         blank=True, upload_to='', default='default.png')
-    friends = models.ManyToManyField(
+    friendlist = models.ManyToManyField(
         'User', related_name='friends', blank=True)
     blocked_users = models.ManyToManyField(
         'User', related_name='blocked', blank=True)
