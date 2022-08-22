@@ -98,13 +98,13 @@ def logoutUser(request):
     return redirect('home')
 
 
-def profile(request, username, usertag):
+def profile(request, username, tag):
 
     try:
-        user = User.objects.filter(Q(username=username) and Q(tag=usertag))[0]
+        user = User.objects.filter(Q(username=username) and Q(tag=tag))[0]
     except IndexError: 
         messages.error(request, 'User does not exist!')
-        return redirect('profile', request.user.username, request.user.tag) 
+        return redirect('home') 
         # Need to change this later incase the user isn't logged in
 
     context = {
