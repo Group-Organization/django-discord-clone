@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'styles/general.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/register.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <form method="post" name="register-form" class="container" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h1>Register</h1>
+
+            <div class="firstfields show">
+
+                <div class="username field">
+                    <label for="username">Username:</label>
+                    {{form.username}}
+                    <p id="usernameErr" class="err">error</p>
+
+                </div>
+    
+                <div class="email field">
+                    <label for="email">Email:</label>
+                    {{form.email}}
+                    <p id="emailErr" class="err">error</p>
+                </div>
+
+                <div class="password field">
+                    <label for="password">Password:</label>
+                    {{form.password}}
+                    <p id="passwordErr" class="err">error</p>
+                </div>
+
+                <button id="nextBtn">Submit</button>
+            </div>
+
+            <div class="secondFields hide">
+
+                <div id="profilePictureField" class="field">
+                    <img id="profilePictureDisplay" src="{% static 'images/default.png' %}">
+                    {{form.profile_picture}}
+                </div>
+    
+                <div class="dob field">
+                    <label for="dob">Date of birth: </label>
+                    {{form.dob}}
+                    <p id="dobErr" class="err"></p>
+                </div>
+
+                <div class="bio field">
+                    <label for="bio">Bio:</label>
+                    {{form.bio}}
+                </div>
+
+                <p id="lastErrField" class="err">Main ErrField</p>
+                <div class="btns">
+                    <button id="submitBtn">Submit</button>
+                    <button id="backBtn">Back</button>
+                </div>
+            </div>
+
+            <div class="loginRedirect">
+                <p>Already have an account?</p>
+                <a href="{% url 'login' %}">Login</a>
+            </div>
+        </form>
+    </main>
+    <script src="{% static 'js/register.js' %}"></script>
+{% endblock %}

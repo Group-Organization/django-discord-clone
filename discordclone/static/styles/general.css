@@ -1,0 +1,22 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+body {
+    background: linear-gradient(286.97deg, #430E78 38.13%, #282828 70.04%);
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
+
+:root {
+    --mainColor: #313131;
+}

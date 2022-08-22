@@ -8,7 +8,6 @@ urlpatterns = [
     path('register/', views.registerUser, name='register'),
     path('login/', views.loginUser, name='login'),
     path('logout/', views.logoutUser, name='logout'),
-    path('profile/<str:pk>/', views.profile, name='profile'),
-    path('profiles/', views.profiles, name='profiles'),
+    path('profile/<str:username>/<int:usertag>', views.profile, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

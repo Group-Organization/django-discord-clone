@@ -1,3 +1,4 @@
+import random
 from django.contrib import messages
 from .forms import UserForm
 from .models import User
@@ -5,74 +6,108 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.db.models import Q
 
 def registerUser(request):
-    page = 'register'
     form = UserForm()
-    context = {'page': page, 'form': form}
+
+
+    # Redirects user to profile page if they're trying to login while already logged in.
+    if request.user.is_authenticated:
+        messages.error(request, 'You are already authenticated!')
+        return redirect('profile', request.user.username, request.user.tag)
 
     if request.method == 'POST':
-        form = UserForm(request.POST)
+        form = UserForm(request.POST, request.FILES)
+        
         if form.is_valid():
             user = form.save(commit=False)
 
-            if User.objects.filter(username=user.username).exists():
+            def userTagGen():
+                tag = ''
+                for i in range(4):
+                    tag += str(random.randint(0, 9))
+                return  int(tag)
+
+            userTag = userTagGen()
+
+            if User.objects.filter(username=user.email).exists():
                 messages.error(request, 'User already exists!')
                 return redirect('register')
 
+            # Attempts to get the user a unique tag that hasnt been taken by the username.
+            chances = 0
+            while User.objects.filter(Q(username=user.username.lower()) and Q(tag=userTag)):
+                for i in range(4):
+                    userTag = userTagGen()
+                    chances = chances + 1
+                if chances > 3:
+                    messages.error(request, 'Pick another username!')
+                    return redirect('register')
+
             user.username = user.username.lower()
+            user.tag = userTag
             user.email = user.email.lower()
             user.set_password(form.cleaned_data['password'])
             user.save()
             login(request, user)
-            return redirect('home')
+            return redirect('index')
         else:
-            return messages.error(request, 'An error ocurred during registration')
-    return render(request, 'userhandler/register_login.html', context)
+            messages.error(request, 'An error ocurred during registration')
+            return redirect('register')
+
+    context = {
+        'form': form,
+        }
+
+    return render(request, 'userhandler/register.html', context)
 
 
 def loginUser(request):
-    page = 'login'
-    context = {'page': page}
+    form = UserForm()
 
-    # if request.user.is_authenticated:
-    #     messages.error(request, 'You are already authenticated!')
-    #     return redirect('profiles')
+    # Redirects user to profile page if they're trying to login while already logged in.
+    if request.user.is_authenticated:
+        messages.error(request, 'You are already authenticated!')
+        return redirect('profile', request.user.username, request.user.tag)
 
     if request.method == 'POST':
-        username = request.POST.get('username').lower()
+        email = request.POST.get('email').lower()
         password = request.POST.get('password')
 
-        if not User.objects.filter(username=username).exists():
+        if not User.objects.filter(email=email).exists():
             messages.error(request, 'Username not found')
             return redirect('login')
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user != None:
             login(request, user)
-            return redirect('profiles')
+            return redirect('profile', request.user.username, request.user.tag)
         else:
             messages.error(request, 'Username or password does not exist')
 
-    return render(request, 'userhandler/register_login.html', context)
+    context = {
+        'form': form,
+    }
 
+    return render(request, 'userhandler/login.html', context)
 
+@login_required(login_url='login')
 def logoutUser(request):
     logout(request)
     return redirect('home')
 
 
-def profile(request, pk):
-    user = User.objects.get(id=pk)
+def profile(request, username, usertag):
+
+    try:
+        user = User.objects.filter(Q(username=username) and Q(tag=usertag))[0]
+    except IndexError: 
+        messages.error(request, 'User does not exist!')
+        return redirect('profile', request.user.username, request.user.tag) 
+        # Need to change this later incase the user isn't logged in
+
     context = {
         'user': user,
     }
     return render(request, 'userhandler/profile.html', context)
-
-
-def profiles(request):
-    users = User.objects.all()
-    context = {
-        'users': users,
-    }
-    return render(request, 'userhandler/profiles.html', context)
