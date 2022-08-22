@@ -2,19 +2,22 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from userhandler.models import User
+from .models import TextChannel, Server
 
 # Create your views here.
 
 
-def index(request):
+def index(request, pk):
     print('hey')
     return HttpResponse(request, 'Hey!')
 
 
 @login_required(login_url='login')
-def server(request):
-    # friends = request.user.
-    context = {'friends': friends}
+def server(request, pk):
+    friends = request.user.objects.values('friend_list').distinct()
+    textChannel = TextChannel.objects.get(id=pk)
+    text_channels = textChannel.parent.text_channels
+    context = {'friends': friends, 'text_channels': text_channels, }
 
     return render(request, 'app/server.html', context)
 
@@ -22,7 +25,7 @@ def server(request):
 @login_required(login_url='login')
 def friends(request):
     user = User.objects.get(email=request.user.email)
-    userFriendList = user.friend.all()
+    userFriendList = user.friendlist.all()
     blocked_users = user.blocked_users.all()
     pending = []
     friends = []
