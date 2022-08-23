@@ -12,8 +12,8 @@
 <main>
 	<div class="friends">
 		<h1>Friends</h1>
-		{% for people in friends %}
-		<a href="/">{{people.username}}</a>
+		{% for friend in friends %}
+		<a href="/">{{friend.username}}</a>
 		<hr />
 		{% endfor %}
 	</div>
