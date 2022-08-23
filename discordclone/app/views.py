@@ -31,6 +31,13 @@ def friends(request):
     blocked_users = user.blocked_users.all()
     pending = user.pending_users.all()
 
+    for people in friends:
+        if people in blocked_users:
+            user.friendlist.remove(people)
+        elif not user in people.friendlist.all():
+            user.friendlist.remove(people)
+            user.pending_users.add(people)
+
     context = {
         'friends': friends,
         'blocked': blocked_users,
@@ -40,10 +47,14 @@ def friends(request):
 
 
 @login_required(login_url='login')
-def addFriend(request, friendUsername):
+def addFriend(request, friendUsername, friendTag):
     newFriend = User.objects.filter(username=friendUsername.lower())
     user = request.user
     userFriends = user.friendlist.all()
+
+    if request.user == newFriend:
+        messages.error(request, 'You can\'t add yourself!')
+        return redirect('friends')
 
     if not newFriend.exists():
         messages.error('User does not exist!')
@@ -58,17 +69,27 @@ def addFriend(request, friendUsername):
     return redirect('friends')
 
 
-def removeFriend(request, friendUsername):
+def removeFriend(request, friendUsername, friendTag):
     friend = User.objects.filter(username=friendUsername.lower())
     user = request.user
     userFriends = user.friendlist.all()
+    userPendingFriends = user.pending_users.all()
+
+    if request.user == friend:
+        messages.error(request, 'You can\'t unfriend yourself!')
+        return redirect('friends')
 
     if not friend.exists():
         messages.error('User does not exist!')
         return redirect('friends')
-    if not friend[0] in userFriends:
+    if not friend[0] in userFriends or not friend[0] in userPendingFriends:
+        print(userPendingFriends, userFriends)
         messages.error(request, 'You are not friends with this user!')
         return redirect('friends')
 
-    user.friendlist.remove(friend[0])
+    if friend[0] in userFriends:
+        user.friendlist.remove(friend[0])
+    elif friend[0] in userPendingFriends:
+        user.pending_users.remove(friend[0])
+
     return redirect('friends')
