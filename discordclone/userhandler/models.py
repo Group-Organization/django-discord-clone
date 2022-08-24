@@ -18,6 +18,8 @@ class User(AbstractUser):
         'User', related_name='blocked', blank=True)
     servers = models.ManyToManyField(
         'app.Server', related_name='servers', blank=True)
+    pending_users = models.ManyToManyField(
+        'User', related_name='pending', blank=True)
     created = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
