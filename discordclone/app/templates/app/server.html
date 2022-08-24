@@ -1,30 +1,49 @@
-{% extends 'layout.html' %} {% block styles %} {% endblock %} {% block content
-%}
+{% extends 'layout.html' %}
+<!-- Comment for formatting purposes-->
+{% block styles %} {% endblock %}
+<!-- Comment for formatting purposes-->
+{% block content%}
 <style>
 	main {
 		display: grid;
 		grid-template-columns: 1fr 2fr 5fr 2fr;
 	}
+	a,
+	a:visited,
+	a:hover,
+	a:active {
+		color: inherit;
+	}
 </style>
-
-<h1>{{request.user.username}}#{{request.user.tag}}</h1>
 
 <main>
 	<div class="friends">
 		<h1>Friends</h1>
 		{% for friend in friends %}
-		<a href="/">{{friend.username}}</a>
+		<img
+			src="{{ friend.profile_picture.url }}"
+			style="border-radius: 50%; width: 25px; height: 25px"
+		/>
+		<a href="{% url 'profile' friend.username friend.tag  %}"
+			>{{friend.username}}</a
+		>
 		<hr />
 		{% endfor %}
 	</div>
 
 	<div class="">
-		<h1>Text Channels</h1>
+		<div>
+			<h3>Text Channels <a href="">+</a></h3>
+		</div>
+
 		{% for text_channel in text_channels %}
 		<a href="/">{{text_channel.name}}</a>
 		<hr />
 		{% endfor %}
-		<h1>Voice Channels</h1>
+		<div>
+			<h3>Voice Channels <a href="">+</a></h3>
+		</div>
+
 		{% for voice_channel in voice_channels %}
 		<a href="/">{{voice_channel.name}}</a>
 		<hr />
@@ -33,18 +52,28 @@
 
 	<div class="">
 		<h1>Chat</h1>
-		{% for message in messages %}
-		<!-- <img
-		src="{{ user.profile_picture.url }}"
-		style="border-radius: 50%; width: 25px; height: 25px"
-	/>
-	<h3>{{user.username}}</h3> 
-    Commented area to pull and add user to server_message field
-    -->
-		<a href="/">{{message}}</a>
-		<hr />
-		{% endfor %}
+		<div style="overflow: scroll; height: 55%">
+			{% for message in server_messages %}
+			<h3>
+				<img
+					src="{{ message.user.profile_picture.url }}"
+					style="border-radius: 50%; width: 25px; height: 25px"
+				/>
+				@{{user.username}}
+			</h3>
+
+			<p href="/">{{message}}</p>
+			{% endfor %}
+		</div>
+
+		<form method="post" style="position: absolute; bottom: 40px">
+			{% csrf_token %} {{ form.as_p }}
+			<input type="submit" />
+		</form>
 	</div>
-	<div></div>
+	<div>
+		<h5>Online</h5>
+		<h5>Offline</h5>
+	</div>
 </main>
 {% endblock %}

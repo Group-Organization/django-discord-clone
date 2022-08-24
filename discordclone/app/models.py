@@ -6,7 +6,7 @@ from userhandler.models import User
 
 
 class Server(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=256, blank=True)
     owner = models.ForeignKey('userhandler.User', on_delete=models.CASCADE)
@@ -27,7 +27,8 @@ class Server(models.Model):
 
 
 class Role(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=30)
     server = models.ForeignKey('Server', on_delete=models.CharField)
     color = models.CharField(max_length=10)
@@ -37,7 +38,8 @@ class Role(models.Model):
 
 
 class Message(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(
         'userhandler.User', on_delete=models.SET_NULL, null=True)
     message = models.TextField(max_length=500)
@@ -49,7 +51,8 @@ class Message(models.Model):
 
 
 class TextChannel(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, unique=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=64, null=True)
     server = models.ForeignKey(Server, on_delete=models.CASCADE, null=True)
     participants = models.ManyToManyField(

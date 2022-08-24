@@ -3,23 +3,41 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from userhandler.models import User
 from django.contrib import messages
-
-from .models import TextChannel, Server
+from .forms import ServerMessageForm
+from .models import TextChannel, Server, ServerMessage
 
 # Create your views here.
 
 
-def index(request, pk):
-    print('hey')
-    return HttpResponse(request, 'Hey!')
+def index(request, channelId):
+    return HttpResponse(request, TextChannel.objects.get(id=channelId))
 
 
 @login_required(login_url='login')
-def server(request, pk):
-    friends = request.user.objects.values('friend_list').distinct()
-    textChannel = TextChannel.objects.get(id=pk)
-    text_channels = textChannel.parent.text_channels
-    context = {'friends': friends, 'text_channels': text_channels, }
+def server(request, serverId, channelId):
+    user = User.objects.get(id=request.user.id)
+    friends = User.objects.all().filter(id=user.id).first().friendlist.all()
+    server = Server.objects.get(id=serverId)
+    textChannel = TextChannel.objects.get(id=channelId)
+    text_channels = TextChannel.objects.all().filter(server=server)
+    server_messages = ServerMessage.objects.all().filter(server=server)
+    # Voice channels query needed and stuff
+    form = ServerMessageForm()
+
+    if request.method == 'POST':
+        form = ServerMessageForm(request.POST)
+        if form.is_valid():
+            server_msg = form.save(commit=False)
+            server_msg.user = user
+            server_msg.server = server
+            server_msg.channel = textChannel
+            form.save()
+
+    context = {'friends': friends,
+               'text_channels': text_channels,
+               'textChannel': textChannel,
+               'server_messages': server_messages,
+               'form': form}
 
     return render(request, 'app/server.html', context)
 
