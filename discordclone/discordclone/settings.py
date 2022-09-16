@@ -22,6 +22,9 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    # 'daphne',
+    'channels',
+    'app.apps.AppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,7 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userhandler.apps.UserhandlerConfig',
-    'app.apps.AppConfig',
+    'discordclone',
+    # 'app',
 
 ]
 
@@ -60,8 +64,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'discordclone.wsgi.application'
 
 
 # Database
@@ -127,3 +129,14 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'userhandler.User'
+
+
+WSGI_APPLICATION = 'discordclone.wsgi.application'
+
+ASGI_APPLICATION = 'discordclone.routing.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

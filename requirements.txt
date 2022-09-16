@@ -1,4 +1,4 @@
-asgiref==3.4.1
+asgiref==3.5
 autopep8==1.5.7
 Django==3.2.7
 django-cors-headers==3.8.0
@@ -10,3 +10,5 @@ sqlparse==0.4.2
 toml==0.10.2
 typing_extensions==4.3.0
 uuid==1.30
+daphne==3.0.2
+channels==3.0.5

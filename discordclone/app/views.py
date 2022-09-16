@@ -15,7 +15,7 @@ def index(request, channelId):
 
 @login_required(login_url='login')
 def server(request, serverId, channelId):
-    user = User.objects.get(id=request.user.id)
+    user = User.objects.all().filter(id=request.user.id, tag=request.user.tag).first()
     friends = User.objects.all().filter(id=user.id).first().friendlist.all()
     server = Server.objects.get(id=serverId)
     textChannel = TextChannel.objects.get(id=channelId)
@@ -111,3 +111,13 @@ def removeFriend(request, friendUsername, friendTag):
         user.pending_users.remove(friend[0])
 
     return redirect('friends')
+
+
+def room(request, room_name):
+    return render(request, 'app/testRoom.html', {
+        'room_name': room_name
+    })
+
+
+def rooms(request):
+    return render(request, 'app/test.html')

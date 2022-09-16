@@ -6,7 +6,8 @@ from userhandler.models import User
 
 
 class Server(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=256, blank=True)
     owner = models.ForeignKey('userhandler.User', on_delete=models.CASCADE)

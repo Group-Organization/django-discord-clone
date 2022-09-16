@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+<!-- Comment for formatting purposes-->
+{% block styles %} {% endblock %}
+<!-- Comment for formatting purposes-->
+{% block content%}
+
+<main>
+	<div>
+		<!-- Chat room code for channels (ws)-->
+		What chat room would you like to enter?<br />
+		<input id="room-name-input" type="text" size="100" /><br />
+		<input id="room-name-submit" type="button" value="Enter" />
+
+		<script>
+			document.querySelector("#room-name-input").focus();
+			document.querySelector("#room-name-input").onkeyup = function (e) {
+				if (e.keyCode === 13) {
+					// enter, return
+					document.querySelector("#room-name-submit").click();
+				}
+			};
+			const arrWindowLocation = window.location.pathname.split("/");
+			console.log(arrWindowLocation);
+			document.querySelector("#room-name-submit").onclick = function (e) {
+				var roomName = document.querySelector("#room-name-input").value;
+				window.location.pathname = "/app/" + "room/" + roomName;
+			};
+		</script>
+		<!-- End of room code for channels (needs the location.pathname to include the server id (/app/<serverID>/roomName/))-->
+	</div>
+</main>
+{% endblock %}
