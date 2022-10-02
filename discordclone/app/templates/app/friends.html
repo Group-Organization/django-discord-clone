@@ -8,7 +8,7 @@
 <style>
     main {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 
 </style>
@@ -35,6 +35,14 @@
         <div class="blocked">
             <h1>Blocked</h1>
             {% for people in blocked %}
+            <a href="{% url 'profile' people.username people.tag %}">{{people.username}}</a>
+            <hr>
+            {% endfor %}
+        </div>
+
+        <div class="requests">
+            <h1>Requests</h1>
+            {% for people in requests %}
             <a href="{% url 'profile' people.username people.tag %}">{{people.username}}</a>
             <hr>
             {% endfor %}
