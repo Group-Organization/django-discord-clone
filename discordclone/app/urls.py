@@ -12,5 +12,5 @@ urlpatterns = [
     path('friends/block-user/', views.blockUser, name='blockUser'),
     path('friends/unblock-user/', views.unblockUser, name='unblockUser'),
     path('room/<str:room_name>', views.room, name="room"),
-    path('test/', views.rooms, name='rooms'),
+    path('test/', views.rooms, name='rooms')
 ]
