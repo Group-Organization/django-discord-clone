@@ -24,6 +24,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     # 'daphne',
     'channels',
+    'rest_framework',
     'app.apps.AppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
