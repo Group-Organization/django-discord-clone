@@ -1,0 +1,65 @@
+{% extends 'layout.html' %} {% load static %} {% block styles %} {% endblock %}
+{% block content %}
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+	main {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		height: 100vh;
+	}
+	.chat {
+		background-color: rgb(15, 6, 46);
+		height: 100%;
+	}
+	.friends {
+		padding: 8px 16px;
+	}
+	nav {
+		width: 100%;
+		display: flex;
+		justify-content: space-evenly;
+	}
+	nav > button {
+		padding: 6px 32px;
+		font-size: 1rem;
+		background-color: rgb(32, 17, 90);
+		color: white;
+		border-radius: 5px;
+		cursor: pointer;
+		margin-top: 8px;
+	}
+	#activeTab {
+		margin: 8px 0 16px;
+	}
+</style>
+
+<main>
+	<div class="chat">
+		<p>lol</p>
+	</div>
+	<div class="friends">
+		<h1>{{request.user.username}}#{{request.user.tag}}</h1>
+		<nav>
+			<button class="btn--nav" data-id="friends">Friends</button>
+			<button class="btn--nav" data-id="pending">Pending</button>
+			<button class="btn--nav" data-id="requests">Requests</button>
+			<button class="btn--nav" data-id="blocked">Blocked</button>
+			<p class="err--nav">Error</p>
+		</nav>
+		<p id="activeTab">Currently viewing</p>
+		<div id="friends--display">
+			<p>hello</p>
+		</div>
+	</div>
+</main>
+
+<script>
+	var fetchUrl = `{% url 'friends' %}`; // Used for get data from friends url.
+</script>
+<script src="{% static 'js/home.js' %}"></script>
+
+{% endblock %}
