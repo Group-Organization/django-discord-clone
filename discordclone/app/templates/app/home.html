@@ -1,64 +1,36 @@
-{% extends 'layout.html' %} {% load static %} {% block styles %} {% endblock %}
-{% block content %}
-<style>
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-	main {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		height: 100vh;
-	}
-	.chat {
-		background-color: rgb(15, 6, 46);
-		height: 100%;
-	}
-	.friends {
-		padding: 8px 16px;
-	}
-	nav {
-		width: 100%;
-		display: flex;
-		justify-content: space-evenly;
-	}
-	nav > button {
-		padding: 6px 32px;
-		font-size: 1rem;
-		background-color: rgb(32, 17, 90);
-		color: white;
-		border-radius: 5px;
-		cursor: pointer;
-		margin-top: 8px;
-	}
-	#activeTab {
-		margin: 8px 0 16px;
-	}
-</style>
+{% extends 'base.html' %} 
+{% load static %} 
 
-<main>
-	<div class="chat">
-		<p>lol</p>
-	</div>
-	<div class="friends">
+{% block body %}
+<main class="container mx-auto text-white flex">
+	<div class="chat flex-1">
 		<h1>{{request.user.username}}#{{request.user.tag}}</h1>
-		<nav>
-			<button class="btn--nav" data-id="friends">Friends</button>
-			<button class="btn--nav" data-id="pending">Pending</button>
-			<button class="btn--nav" data-id="requests">Requests</button>
-			<button class="btn--nav" data-id="blocked">Blocked</button>
-			<p class="err--nav">Error</p>
+	</div>
+	<div class="friends flex-1 p-4 ">
+		<nav class="flex justify-evenly w-full gap-4 items-center">
+			<button class="btn--nav py-0 px-2 rounded-sm" data-id="online">Online</button>
+			<button class="btn--nav py-0 px-2 rounded-sm" data-id="friends">All</button>
+			<button class="btn--nav py-0 px-2 rounded-sm" data-id="pending">Pending</button>
+			<button class="btn--nav py-0 px-2 rounded-sm" data-id="requests">Requests</button>
+			<button class="btn--nav py-0 px-2 rounded-sm" data-id="blocked">Blocked</button>
+			<button data-id="add-friends" class="btn--nav bg-teal-800 font-medium rounded px-2">Add Friend</button>
 		</nav>
-		<p id="activeTab">Currently viewing</p>
-		<div id="friends--display">
-			<p>hello</p>
+		<input type="text" name="search" placeholder="Search" id="search" class="px-4 w-full mt-4 bg-neutral-900 rounded-lg border-none placeholder:text-gray-400">
+		<p class="err--nav">Error</p>
+		<div id="friends--display" class="mt-4">
+			<!-- Holds the friends list -->
 		</div>
 	</div>
 </main>
 
+
+{% endblock %}
+
+{% block js %}
+
 <script>
 	var fetchUrl = `{% url 'friends' %}`; // Used for get data from friends url.
+	var searchUrl = `{% url 'search' %}`
 </script>
 <script src="{% static 'js/home.js' %}"></script>
 

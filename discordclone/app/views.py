@@ -7,6 +7,8 @@ from .forms import ServerMessageForm
 from .models import TextChannel, Server, ServerMessage
 from django.views.decorators.http import require_http_methods
 from .serializer import *
+from django.db.models import Q
+
 
 # Create your views here.
 
@@ -61,12 +63,28 @@ def friends(request):
         response = user.blocked.all()
     elif mode == 'requests':
         response = User.objects.filter(pending=request.user)
+    elif mode == 'online':
+        response = User.objects.filter(
+            Q(friends=request.user) & Q(status='online'))
     else:
         return JsonResponse({'err': 'Mode not supported'}, status=400)
 
     serializer = UserSerializer(response, many=True)
 
     return JsonResponse(serializer.data, safe=False, status=200)
+
+
+@require_http_methods(['GET'])
+@login_required(login_url='login')
+def search(request):
+    try:
+        q = request.GET['q'] # If there is no q, it returns all the user's friends.
+    except:
+        q = ''
+    
+    response = User.objects.filter(Q(friends=request.user) & (Q(username__contains=q) | Q(tag__contains=q)))
+    serializer = UserSerializer(response, many=True)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
 @login_required(login_url='login')
