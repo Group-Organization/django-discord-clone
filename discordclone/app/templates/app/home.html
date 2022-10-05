@@ -2,11 +2,11 @@
 {% load static %} 
 
 {% block body %}
-<main class="container mx-auto text-white flex">
+<main class="container mx-auto h-full text-white flex">
 	<div class="chat flex-1">
 		<h1>{{request.user.username}}#{{request.user.tag}}</h1>
 	</div>
-	<div class="friends flex-1 p-4 ">
+	<div class="friends flex-1 p-4 border-l-2 border-neutral-600">
 		<nav class="flex justify-evenly w-full gap-4 items-center">
 			<button class="btn--nav py-0 px-2 rounded-sm" data-id="online">Online</button>
 			<button class="btn--nav py-0 px-2 rounded-sm" data-id="friends">All</button>
@@ -15,7 +15,15 @@
 			<button class="btn--nav py-0 px-2 rounded-sm" data-id="blocked">Blocked</button>
 			<button data-id="add-friends" class="btn--nav bg-teal-800 font-medium rounded px-2">Add Friend</button>
 		</nav>
-		<input type="text" name="search" placeholder="Search" id="search" class="px-4 w-full mt-4 bg-neutral-900 rounded-lg border-none placeholder:text-gray-400">
+		<input id="search--form" type="text" name="search" placeholder="Search" class="px-4 w-full mt-4 bg-neutral-900 rounded-lg border-none placeholder:text-gray-400">
+		
+		<div id="add-friend--form" class="hidden mt-4">
+			<form class="flex flex-col gap-4">
+				<label for="add-friend--input" class="font-bold text-lg text-green-600">Add friend</label>
+				<input type="text" name="add-friend" placeholder="eg: snow#0000" id="add-friend--input" class="px-4 w-full bg-neutral-900 rounded-lg border-none placeholder:text-gray-400">
+				<button id="add-friend--submit" type="submit" class="px-6 py-1 bg-green-500 text-white w-fit rounded">Add</button>
+			</form>
+		</div> 
 		<p class="err--nav">Error</p>
 		<div id="friends--display" class="mt-4">
 			<!-- Holds the friends list -->
@@ -31,6 +39,7 @@
 <script>
 	var fetchUrl = `{% url 'friends' %}`; // Used for get data from friends url.
 	var searchUrl = `{% url 'search' %}`
+	var addfriendUrl = `{% url 'addFriend' %}`
 </script>
 <script src="{% static 'js/home.js' %}"></script>
 

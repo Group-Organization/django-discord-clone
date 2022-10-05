@@ -8,7 +8,9 @@ from .models import TextChannel, Server, ServerMessage
 from django.views.decorators.http import require_http_methods
 from .serializer import *
 from django.db.models import Q
-
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, renderer_classes
 
 # Create your views here.
 
@@ -78,15 +80,18 @@ def friends(request):
 @login_required(login_url='login')
 def search(request):
     try:
-        q = request.GET['q'] # If there is no q, it returns all the user's friends.
+        # If there is no q, it returns all the user's friends.
+        q = request.GET['q']
     except:
         q = ''
-    
-    response = User.objects.filter(Q(friends=request.user) & (Q(username__contains=q) | Q(tag__contains=q)))
+
+    response = User.objects.filter(Q(friends=request.user) & (
+        Q(username__contains=q) | Q(tag__contains=q)))
     serializer = UserSerializer(response, many=True)
     return JsonResponse(serializer.data, status=200, safe=False)
 
 
+@api_view(['GET'])
 @login_required(login_url='login')
 def addFriend(request):
     try:
@@ -94,8 +99,7 @@ def addFriend(request):
         tag = int(request.GET['tag'])
         friend = User.objects.filter(username=username, tag=tag)[0]
     except:
-        messages.error(request, 'User does not exist')
-        return redirect('home')
+        return Response({'err': 'Could not find user!'}, status=400)
 
     userFriends = request.user.friends.all()
     userPending = request.user.pending.all()
@@ -103,22 +107,18 @@ def addFriend(request):
 
     # Trying to add yourself
     if request.user == friend:
-        messages.error(request, 'You can\'t add yourself!')
-        return redirect('home')
+        return Response({'err': 'You can\'t add yourself!'}, status=status.HTTP_400_BAD_REQUEST)
 
     # If the user is already friends with the active user.
     if friend in userFriends or friend in userPending:
-        messages.error(request, 'You\'ve already added this user!')
-        return redirect('home')
+        return Response({'err': 'You\'ve already added this user!'}, status=status.HTTP_400_BAD_REQUEST)
 
     # If the active user has blocked the user.
     elif friend in userBlocked:
-        messages.error(request, 'You\'ve blocked this user!')
-        return redirect('home')
+        return Response({'err': 'You\'ve blocked this user!'}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.user in friend.blocked.all():
-        messages.error(request, 'This user has blocked you!')
-        return redirect('home')
+        return Response({'err': 'This user has blocked you!'}, status=status.HTTP_400_BAD_REQUEST)
 
     # If the user being friended is already friends(pending) with the active user, it makes both user friends, and removes the pending status from the user being friended.
     if request.user in friend.pending.all():
@@ -128,8 +128,7 @@ def addFriend(request):
     else:  # If the user being friended is not friends with the active user, it adds the active user to the pending list.
         request.user.pending.add(friend)
 
-    messages.success(request, 'Your friend was added successfully!')
-    return redirect('home')
+    return Response({'success': 'Your friend was added successfully'}, status=status.HTTP_202_ACCEPTED)
 
 
 def removeFriend(request):
@@ -203,7 +202,7 @@ def blockUser(request):
 
     return redirect('home')
 
-
+@login_required(login_url='login')
 def home(request):
     return render(request, 'app/home.html')
 
