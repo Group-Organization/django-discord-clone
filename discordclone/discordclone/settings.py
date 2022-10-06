@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-x0l#*s$5o=a7s4fz#&8e!3kw8kqbo+q_n@5t(2y8av*y1(v7y4
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.100.11',
+    '*',
     '127.0.0.1'
 ]
 
@@ -25,6 +25,9 @@ INSTALLED_APPS = [
     # 'daphne',
     'channels',
     'rest_framework',
+    'tailwind',
+    'theme',
+    'django_browser_reload',
     'app.apps.AppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # "django_browser_reload.middleware.BrowserReloadMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -141,3 +145,11 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
+
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"

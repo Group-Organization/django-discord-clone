@@ -13,5 +13,6 @@ urlpatterns = [
     path('block-user/', views.blockUser, name='blockUser'),
     path('unblock-user/', views.unblockUser, name='unblockUser'),
     path('room/<str:room_name>', views.room, name="room"),
+    path('search', views.search, name="search"),
     path('test/', views.rooms, name='rooms')
 ]

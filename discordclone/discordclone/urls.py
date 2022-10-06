@@ -8,7 +8,8 @@ from . import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('userhandler.urls')),
-    path('app/', include('app.urls'))
+    path('app/', include('app.urls')),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]
 
 # Provisional method of leading user files, as for non-Heroku-actual-production level sites, it should be configured to save these files in like AWS
