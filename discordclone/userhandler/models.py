@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 import uuid
 from django.contrib.auth.models import AbstractUser
 
@@ -12,8 +13,8 @@ class User(AbstractUser):
     dob = models.DateField(blank=True)
     profile_picture = models.ImageField(
         blank=True, upload_to='', default='default.png')
-    friendlist = models.ManyToManyField(
-        'User', related_name='friends', blank=True)
+    friends = models.ManyToManyField(
+        'User', related_name='user_friends', blank=True)
     blocked_users = models.ManyToManyField(
         'User', related_name='blocked', blank=True)
     servers = models.ManyToManyField(
@@ -26,4 +27,4 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username', 'dob']
 
     def __str__(self):
-        return self.username
+        return f'{self.username}#{str(self.tag)}'

@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from userhandler.models import User
 from django.contrib import messages
 from .forms import ServerMessageForm
 from .models import TextChannel, Server, ServerMessage
+from django.views.decorators.http import require_http_methods
+from .serializer import *
+from django.db.models import Q
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, renderer_classes
 
 # Create your views here.
 
@@ -16,7 +22,7 @@ def index(request, channelId):
 @login_required(login_url='login')
 def server(request, serverId, channelId):
     user = User.objects.all().filter(id=request.user.id, tag=request.user.tag).first()
-    friends = User.objects.all().filter(id=user.id).first().friendlist.all()
+    friends = User.objects.all().filter(id=user.id).first().friends.all()
     server = Server.objects.get(id=serverId)
     textChannel = TextChannel.objects.get(id=channelId)
     text_channels = TextChannel.objects.all().filter(server=server)
@@ -42,75 +48,191 @@ def server(request, serverId, channelId):
     return render(request, 'app/server.html', context)
 
 
+@require_http_methods(["GET"])
 @login_required(login_url='login')
 def friends(request):
-    user = User.objects.get(email=request.user.email)
-    friends = user.friendlist.all()
-    blocked_users = user.blocked_users.all()
-    pending = user.pending_users.all()
+    try:
+        mode = request.GET['mode']
+        user = User.objects.get(email=request.user.email)
+    except:
+        return JsonResponse({'err': 'Mode is not specified'}, status=404)
 
-    for people in friends:
-        if people in blocked_users:
-            user.friendlist.remove(people)
-        elif not user in people.friendlist.all():
-            user.friendlist.remove(people)
-            user.pending_users.add(people)
+    if mode == 'friends':
+        response = user.friends.all()
+    elif mode == 'pending':
+        response = user.pending.all()
+    elif mode == 'blocked':
+        response = user.blocked.all()
+    elif mode == 'requests':
+        response = User.objects.filter(pending=request.user)
+    elif mode == 'online':
+        response = User.objects.filter(
+            Q(friends=request.user) & Q(status='online'))
+    else:
+        return JsonResponse({'err': 'Mode not supported'}, status=400)
 
-    context = {
-        'friends': friends,
-        'blocked': blocked_users,
-        'pending': pending,
-    }
-    return render(request, 'app/friends.html', context)
+    serializer = UserSerializer(response, many=True)
+
+    return JsonResponse(serializer.data, safe=False, status=200)
 
 
+@require_http_methods(['GET'])
 @login_required(login_url='login')
-def addFriend(request, friendUsername, friendTag):
-    newFriend = User.objects.filter(username=friendUsername.lower())
-    user = request.user
-    userFriends = user.friendlist.all()
+def search(request):
+    try:
+        # If there is no q, it returns all the user's friends.
+        q = request.GET['q']
+    except:
+        q = ''
 
-    if request.user == newFriend:
-        messages.error(request, 'You can\'t add yourself!')
-        return redirect('friends')
-
-    if not newFriend.exists():
-        messages.error('User does not exist!')
-        return redirect('friends')
-    if newFriend[0] in userFriends:
-        messages.error(request, 'You\'ve already added this user!')
-        return redirect('friends')
-
-    print(newFriend[0])
-    user.friendlist.add(newFriend[0])
-
-    return redirect('friends')
+    response = User.objects.filter(Q(friends=request.user) & (
+        Q(username__contains=q) | Q(tag__contains=q)))
+    serializer = UserSerializer(response, many=True)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
-def removeFriend(request, friendUsername, friendTag):
-    friend = User.objects.filter(username=friendUsername.lower())
-    user = request.user
-    userFriends = user.friendlist.all()
-    userPendingFriends = user.pending_users.all()
+@api_view(['GET'])
+@login_required(login_url='login')
+def addFriend(request):
+    try:
+        username = request.GET['username'].lower()
+        tag = int(request.GET['tag'])
+        friend = User.objects.filter(username=username, tag=tag)[0]
+    except:
+        return Response({'err': 'Could not find user!'}, status=400)
 
+    userFriends = request.user.friends.all()
+    userPending = request.user.pending.all()
+    userBlocked = request.user.blocked.all()
+
+    # Trying to add yourself
+    if request.user == friend:
+        return Response({'err': 'You can\'t add yourself!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # If the user is already friends with the active user.
+    if friend in userFriends or friend in userPending:
+        return Response({'err': 'You\'ve already added this user!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # If the active user has blocked the user.
+    elif friend in userBlocked:
+        return Response({'err': 'You\'ve blocked this user!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.user in friend.blocked.all():
+        return Response({'err': 'This user has blocked you!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # If the user being friended is already friends(pending) with the active user, it makes both user friends, and removes the pending status from the user being friended.
+    if request.user in friend.pending.all():
+        request.user.friends.add(friend)
+        friend.pending.remove(request.user)
+        friend.friends.add(request.user)
+    else:  # If the user being friended is not friends with the active user, it adds the active user to the pending list.
+        request.user.pending.add(friend)
+
+    return Response({'success': 'Your friend was added successfully'}, status=status.HTTP_202_ACCEPTED)
+
+
+def removeFriend(request):
+    try:
+        username = request.GET['username'].lower()
+        tag = int(request.GET['tag'])
+        friend = User.objects.filter(username=username, tag=tag)[0]
+    except:
+        messages.error(request, 'User does not exist')
+        return redirect('home')
+
+    userFriends = request.user.friends.all()
+    userPending = request.user.pending.all()
+    userBlocked = request.user.blocked.all()
+
+    # Trying to unfriend yourself.
     if request.user == friend:
         messages.error(request, 'You can\'t unfriend yourself!')
-        return redirect('friends')
+        return redirect('home')
 
-    if not friend.exists():
-        messages.error('User does not exist!')
-        return redirect('friends')
-    if not friend[0] in userFriends or not friend[0] in userPendingFriends:
-        print(userPendingFriends, userFriends)
+    # Trying to unfriend someone who is not friends with the user.
+    # friends are either pending or friends hence checking for both.
+    if not (friend in userFriends or friend in userPending):
         messages.error(request, 'You are not friends with this user!')
-        return redirect('friends')
+        return redirect('home')
 
-    if friend[0] in userFriends:
-        user.friendlist.remove(friend[0])
-    elif friend[0] in userPendingFriends:
-        user.pending_users.remove(friend[0])
+    # If the user is friends with the active user it unfriends them, and add the pending status to the user since the active user has unfriended them.
+    if friend in userFriends:
+        request.user.friends.remove(friend)
+        friend.friends.remove(request.user)
+        friend.pending.add(request.user)
+    # Just removes the user from pending since, the other user has no relationship with the active user.
+    elif friend in userPending:
+        request.user.pending.remove(friend)
 
-    return redirect('friends')
+    return redirect('home')
+
+
+def blockUser(request):
+    try:
+        username = request.GET['username'].lower()
+        tag = int(request.GET['tag'])
+        user = User.objects.filter(username=username, tag=tag)[0]
+    except:
+        messages.error(request, 'User does not exist')
+        return redirect('home')
+
+    userFriends = request.user.friends.all()
+    userPending = request.user.pending.all()
+    userBlocked = request.user.blocked.all()
+
+    # Trying to block yourself.
+    if request.user == user:
+        messages.error(request, 'You can\'t block yourself!')
+        return redirect('home')
+
+    # If the user is already blocked
+    if user in userBlocked:
+        messages.error(request, 'You\'ve already blocked this user!')
+        return redirect('home')
+
+    # Blocks the user, and if the active user is friends with the user being blocked, the user being blocked friend status would be changed to pending.
+    if user in userFriends:
+        request.user.friends.remove(user)
+        user.friends.remove(request.user)
+        user.pending.add(request.user)
+    elif user in userPending:
+        request.user.pending.remove(user)
+
+    request.user.blocked.add(user)
+
+    return redirect('home')
+
+@login_required(login_url='login')
+def home(request):
+    return render(request, 'app/home.html')
+
+
+def unblockUser(request):
+    try:
+        username = request.GET['username'].lower()
+        tag = int(request.GET['tag'])
+        user = User.objects.filter(username=username, tag=tag)[0]
+    except:
+        messages.error(request, 'User does not exist')
+        return redirect('home')
+
+    userFriends = request.user.friends.all()
+    userPending = request.user.pending.all()
+    userBlocked = request.user.blocked.all()
+
+    # Trying to unblock yourself.
+    if request.user == user:
+        messages.error(request, 'You can\'t unblock yourself!')
+        return redirect('home')
+
+    # If the user is not blocked.
+    if not user in userBlocked:
+        messages.error(request, 'This user is not blocked!')
+        return redirect('home')
+
+    request.user.blocked.remove(user)
+
+    return redirect('home')
 
 
 def room(request, room_name):
