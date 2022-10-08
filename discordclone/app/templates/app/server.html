@@ -52,7 +52,44 @@
 
 	<div class="">
 		<h1>Chat</h1>
-		<div style="overflow: scroll; height: 55%">
+		<textarea id="chat-text" cols="80" rows="30"></textarea> <br />
+		<input id="input" type="text" size="80" />
+		<input id="submit" type="submit" value="Send" />
+
+		{{ room_name|json_script:"room-name" }} 
+		<!-- comment just for prettify not to mess things up-->
+		{{ request.user.username|json_script:"user_username" }}
+		<script>
+			const user_username = JSON.parse(
+				document.getElementById("user_username").textContent
+			);
+			const roomName = JSON.parse(
+				document.getElementById("room-name").textContent
+			);
+			document.querySelector("#submit").onclick = function (e) {
+				const messageInputDom = document.querySelector("#input");
+				const message = messageInputDom.value;
+				console.log(message);
+				chatSocket.send(
+					// first message in dict below should always have strings around it (bad auto correct with prettify)
+					JSON.stringify({
+						'message': message,
+						'username':user_username,
+					})
+				);
+				messageInputDom.value = "";
+			};
+			const chatSocket = new WebSocket(
+				"ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+			);
+
+			chatSocket.onmessage = function (e) {
+				const data = JSON.parse(e.data);
+				console.log(data);
+				document.querySelector("#chat-text").value += data.username + ': ' + data.message + "\n";
+			};
+		</script>
+		<!-- <div style="overflow: scroll; height: 55%">
 			{% for message in server_messages %}
 			<h3>
 				<img
@@ -69,13 +106,13 @@
 		<form method="post" style="position: absolute; bottom: 40px">
 			{% csrf_token %} {{ form.as_p }}
 			<input type="submit" />
-		</form>
+		</form> -->
 	</div>
 	<div>
 		<h5>Online</h5>
 		<h5>Offline</h5>
 		<!-- Chat room code for channels (ws)-->
-		What chat room would you like to enter?<br />
+		<!-- What chat room would you like to enter?<br />
 		<input id="room-name-input" type="text" size="100" /><br />
 		<input id="room-name-submit" type="button" value="Enter" />
 
@@ -94,7 +131,7 @@
 				window.location.pathname =
 					"/app/" + "server/" + arrWindowLocation[3] + "/" + roomName + "/";
 			};
-		</script>
+		</script> -->
 		<!-- End of room code for channels (needs the location.pathname to include the server id (/app/<serverID>/roomName/))-->
 	</div>
 </main>

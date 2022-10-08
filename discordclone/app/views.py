@@ -43,8 +43,10 @@ def server(request, serverId, channelId):
                'text_channels': text_channels,
                'textChannel': textChannel,
                'server_messages': server_messages,
-               'form': form}
-
+               'form': form,
+               # aparently doesn't work with the "-" in the uid
+               'room_name': channelId.replace("-", "_")
+               }
     return render(request, 'app/server.html', context)
 
 
@@ -201,6 +203,7 @@ def blockUser(request):
     request.user.blocked.add(user)
 
     return redirect('home')
+
 
 @login_required(login_url='login')
 def home(request):
